@@ -1,0 +1,30 @@
+<tr
+  class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+  hx-get="/x/paper/{{paper_id}}"
+  hx-trigger="click"
+  hx-target="#page-detail-content"
+>
+  <td class="px-6 py-4 whitespace-nowrap max-w-12 overflow-hidden">
+    <div class="text-sm text-gray-900">{{paper_id}}</div>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap max-w-12 overflow-hidden">
+    <div class="text-sm text-gray-900">{{external_id }}</div>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap max-w-64 overflow-hidden">
+    <div class="text-sm text-gray-900">{{title}}</div>
+  </td>
+  <!-- <td class="px-6 py-4 whitespace-nowrap">
+    <div class="text-sm text-gray-900">{{keywords}}</div>
+  </td> -->
+  <td class="px-6 py-4 whitespace-nowrap max-w-12 overflow-hidden">
+    <span class="text-sm text-gray-900 word-wrap text-ellipsis"
+      >{{abstract_content}}</span
+    >
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap">
+    <div class="text-sm text-gray-900">{{citation_count}}</div>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap">
+    <div class="text-sm text-gray-900">{{reference_count}}</div>
+  </td>
+</tr>

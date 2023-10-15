@@ -1,0 +1,53 @@
+{% extends "_layout.html" %} {% block content %}
+<section class="flex flex-col max-w-screen-xl px-4 py-8 mx-auto">
+  <div class="overflow-x-auto" hx-boost="true">
+    <form
+      hx-post="/x/paper_search"
+      hx-swap="multi:#search-result,#result-count"
+      class="flex rounded-md shadow-sm max-w-120 bg-white sticky top-0 z-10"
+    >
+      <input
+        type="search"
+        name="query"
+        placeholder="Search Query"
+        class="py-3 px-4 block w-full border-1 border-gray-200 shadow-sm rounded-l-md text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400"
+      />
+      <input
+        type="text"
+        name="publication_date_or_year"
+        placeholder="published year"
+        class="py-3 px-4 block w-full border-1 border-gray-200 shadow-sm text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 dark:bg-slate-900 dark:border-gray-700 dark:text-gray-400"
+      />
+      <button
+        type="submit"
+        class="inline-flex flex-shrink-0 justify-center items-center h-[2.875rem] w-[2.875rem] rounded-r-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
+      >
+        <svg
+          class="h-4 w-4"
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="currentColor"
+          viewBox="0 0 16 16"
+        >
+          <path
+            d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"
+          />
+        </svg>
+      </button>
+    </form>
+
+    <div id="result-count" class="flex" hx-swap-oob="true">
+      <h2>total : {{total_count}}</h2>
+    </div>
+    <div
+      class="py-2 align-middle inline-block min-w-full overflow-x-auto border-b border-gray-200 sm:rounded-lg"
+    >
+      {% include "table.html" %}
+    </div>
+  </div>
+</section>
+
+{%include "partial_side_content.html" %}
+
+{% endblock %}

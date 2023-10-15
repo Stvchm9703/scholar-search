@@ -1,0 +1,23 @@
+
+<section>
+  <article>
+    <h1>{{paper_detail.title}}</h1>
+
+    <h2>authors</h2>
+    <ul>
+      {% for author in paper_detail.authors %}
+      <li>{{author.name}}</li>
+      {% endfor %}
+    </ul>
+
+    <h2>abstract</h2>
+    <p>{{ paper_detail.abstract_field }}</p>
+
+    <h2>references ({{paper_detail.reference_count}})</h2>
+    <ul>
+    </ul>
+    <h2>citations ({{paper_detail.citation_count}})</h2>
+    <ul>
+    </ul>
+  </article>
+</section>
