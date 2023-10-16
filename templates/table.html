@@ -1,5 +1,5 @@
 <table
-  id="search-result"
+  id="{{ table_id }}"
   class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
   hx-swap-oob="true"
 >
@@ -7,12 +7,7 @@
     class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
   >
     <tr class="">
-      <th
-        scope="col"
-        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-      >
-        ID
-      </th>
+      <th scope="col"></th>
       <th
         scope="col"
         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -31,6 +26,12 @@
         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
       >
         Abstracts
+      </th>
+      <th
+        scope="col"
+        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+      >
+        Is Open Access
       </th>
       <th
         scope="col"

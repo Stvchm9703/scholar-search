@@ -1,6 +1,7 @@
 pub mod api;
 pub mod template;
 use crate::axum_server::template::{
+    page_detail::{CitingListResponse, CitingListRowTemplate},
     search_page::{SearchPageLayoutTemplate, SearchResultTemplate},
     table::{PaperDetailTemplate, PaperDetailTemplateDetailPrint, TableRowTemplate},
 };
@@ -17,14 +18,11 @@ use axum_htmx::HxBoosted;
 use query_map::QueryMap;
 use tower_http::cors::CorsLayer;
 
-use crate::semantic_scholar_api::paper_fetch::{fetch_paper_detail, fetch_papers, BulkRequest};
+use crate::semantic_scholar_api::{
+    critions::{fetch_citing, fetch_references, CitingRequest},
+    paper_fetch::{fetch_paper_detail, fetch_papers, BulkRequest},
+};
 
-// #[warn(dead_code)]
-// pub async fn root() -> LayoutTemplate {
-//     LayoutTemplate {
-//         // body: "Hello, world!".to_string(),
-//     }
-// }
 
 pub async fn paper_index() -> SearchPageLayoutTemplate {
     let result = fetch_papers(BulkRequest {
@@ -90,11 +88,57 @@ pub async fn paper_detail(Path(paper_id): Path<String>) -> PaperDetailTemplate {
     }
 }
 
+pub async fn paper_references(Path(paper_id): Path<String>) -> CitingListResponse {
+    // println!("paper_id: {:#?}", paper_id);
+    let paper = fetch_references(CitingRequest {
+        paper_id: paper_id.to_owned(),
+        // limit: 100,
+        ..CitingRequest::default()
+    })
+    .await
+    .unwrap();
+    CitingListResponse {
+        table_id: "reference-accordion-collapse-body".to_string(),
+        offset: paper.offset,
+        next: paper.next,
+        rows: paper
+            .data
+            .unwrap()
+            .into_iter()
+            .map(|x| CitingListRowTemplate::from(x))
+            .collect::<Vec<CitingListRowTemplate>>(),
+    }
+}
+
+pub async fn paper_citation(Path(paper_id): Path<String>) -> CitingListResponse {
+    // println!("paper_id: {:#?}", paper_id);
+    let paper = fetch_citing(CitingRequest {
+        paper_id: paper_id.to_owned(),
+        // limit: 100,
+        ..CitingRequest::default()
+    })
+    .await
+    .unwrap();
+    CitingListResponse {
+        table_id: "citation-accordion-collapse-body".to_string(),
+        offset: paper.offset,
+        next: paper.next,
+        rows: paper
+            .data
+            .unwrap()
+            .into_iter()
+            .map(|x| CitingListRowTemplate::from(x))
+            .collect::<Vec<CitingListRowTemplate>>(),
+    }
+}
+
 pub fn create_router_service() -> IntoMakeService<Router> {
     Router::new()
         .route("/", get(paper_index))
         .route("/x/paper_search", post(search_paper))
         .route("/x/paper/:paper_id", get(paper_detail))
+        .route("/x/paper/:paper_id/references", get(paper_references))
+        .route("/x/paper/:paper_id/citations", get(paper_citation))
         // .route("/api", get(json))
         .layer(
             CorsLayer::new()

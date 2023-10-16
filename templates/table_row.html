@@ -4,8 +4,13 @@
   hx-trigger="click"
   hx-target="#page-detail-content"
 >
-  <td class="px-6 py-4 whitespace-nowrap max-w-12 overflow-hidden">
-    <div class="text-sm text-gray-900">{{paper_id}}</div>
+  <td class="">
+    <!-- <div class="text-sm text-gray-900">{{paper_id}}</div> -->
+    <input
+      type="checkbox"
+      value="{{paper_id}}"
+      class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-700 dark:focus:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"
+    />
   </td>
   <td class="px-6 py-4 whitespace-nowrap max-w-12 overflow-hidden">
     <div class="text-sm text-gray-900">{{external_id }}</div>
@@ -13,13 +18,26 @@
   <td class="px-6 py-4 whitespace-nowrap max-w-64 overflow-hidden">
     <div class="text-sm text-gray-900">{{title}}</div>
   </td>
-  <!-- <td class="px-6 py-4 whitespace-nowrap">
-    <div class="text-sm text-gray-900">{{keywords}}</div>
-  </td> -->
+
   <td class="px-6 py-4 whitespace-nowrap max-w-12 overflow-hidden">
-    <span class="text-sm text-gray-900 word-wrap text-ellipsis"
+    <span
+      class="text-sm text-gray-900 word-wrap text-ellipsis"
+      aria-details="abstract_content"
       >{{abstract_content}}</span
     >
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap">
+    {% if is_open_access -%}
+    <span
+      class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300"
+      >Yes</span
+    >
+    {% else -%}
+    <span
+      class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-red-900 dark:text-red-300"
+      >No</span
+    >
+    {% endif -%}
   </td>
   <td class="px-6 py-4 whitespace-nowrap">
     <div class="text-sm text-gray-900">{{citation_count}}</div>

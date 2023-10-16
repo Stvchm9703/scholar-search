@@ -12,6 +12,7 @@ pub struct SearchPageLayoutTemplate {
 #[derive(Template, Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[template(
     source = r###"
+{% let table_id = "search-result" %}
  {% include "table.html" %}
  <div id="result-count" class="flex" hx-swap-oob="true">
   <h2>total : {{total_count}}</h2>

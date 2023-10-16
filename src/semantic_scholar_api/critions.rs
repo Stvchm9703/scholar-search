@@ -69,7 +69,7 @@ impl Default for CitingRequest {
         CitingRequest {
             paper_id: String::from(""),
             offset: 0,
-            limit: 100,
+            limit: 1000,
         }
     }
 }
