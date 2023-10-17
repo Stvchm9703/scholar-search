@@ -1,11 +1,15 @@
 use serde_derive::Deserialize;
 use serde_derive::Serialize;
-
+use std::fmt::Display;
+use std::str::FromStr;
+// use serde::de::{self, Deserialize, Deserializer};
+use serde_json as json;
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Paper {
     pub paper_id: Option<String>,
     pub external_ids: Option<ExternalIds>,
+    #[serde(default, deserialize_with = "from_str_optional")]
     pub corpus_id: Option<i32>,
     pub publication_venue: Option<PublicationVenue>,
     pub url: Option<String>,
@@ -28,6 +32,24 @@ pub struct Paper {
     pub journal: Option<Journal>,
     pub citation_styles: Option<CitationStyles>,
     pub authors: Option<Vec<Author>>,
+}
+
+fn from_str_optional<'de, T, D>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    T: FromStr,
+    T::Err: Display,
+    D: serde::Deserializer<'de>,
+{
+    let deser_res: Result<json::Value, _> = serde::Deserialize::deserialize(deserializer);
+    match deser_res {
+        Ok(json::Value::String(s)) => T::from_str(&s)
+            .map_err(serde::de::Error::custom)
+            .map(Option::from),
+        Ok(v) => T::from_str(&v.to_string())
+            .map_err(serde::de::Error::custom)
+            .map(Option::from),
+        Err(_) => Ok(None),
+    }
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -112,7 +134,7 @@ pub struct PaperDetail {
     pub url: Option<String>,
     pub title: String,
     #[serde(rename = "abstract")]
-    pub abstract_field: String,
+    pub abstract_field: Option<String>,
     pub venue: Option<String>,
     pub publication_venue: Option<PublicationVenue>,
     pub year: i32,

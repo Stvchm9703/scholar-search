@@ -78,7 +78,7 @@ pub async fn search_paper(
 
 // async fn path(Path(user_id): Path<u32>) {}
 pub async fn paper_detail(Path(paper_id): Path<String>) -> PaperDetailTemplate {
-    println!("paper_id: {:#?}", paper_id);
+    // println!("paper_id: {:#?}", paper_id);
     let paper = fetch_paper_detail(paper_id.to_owned()).await.unwrap();
     PaperDetailTemplate {
         paper_id: paper_id.to_owned(),
