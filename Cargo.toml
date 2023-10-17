@@ -26,7 +26,7 @@ serde = { version = "*", features = ["derive"] }
 serde_json = "*"
 serde_path_to_error = "0.1"
 
-reqwest = { version = "*" , features = ["json"] }
+reqwest = { version = "*" , features = ["json", "cookies", "brotli", "gzip", "deflate", "stream" ] }
 prost = "0.12"
 tokio = { version = "1", features = [
   "full",
@@ -73,3 +73,5 @@ query_map = {version= "0.7.0" , features = ["url-query"]}
 
 askama = { version= "0.12.1" , features = ["serde-json" , "markdown"]}
 askama_axum = "0.3.0"
+
+sled = "0.34.7"

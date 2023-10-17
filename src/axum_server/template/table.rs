@@ -1,10 +1,8 @@
-use crate::semantic_scholar_api::data::{
-    Author, Paper, PaperDetail,
-    S2FieldsOfStudy,
-};
+use crate::semantic_scholar_api::data::{Author, ExternalIds, Paper, PaperDetail, S2FieldsOfStudy};
 use askama::Template;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap};
+use std::collections::HashMap;
+
 
 #[derive(Template, Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[template(path = "table_row.html", ext = "html")]
@@ -24,13 +22,27 @@ pub struct TableRowTemplate {
 
 impl From<Paper> for TableRowTemplate {
     fn from(x: Paper) -> Self {
+        let mut external_ids_set: String = "".to_string();
+        if let Some(ext_set) = x.external_ids {
+            external_ids_set = format!(
+                "{:?}",
+                vec![
+                    ext_set.doi.unwrap_or_default(),
+                    ext_set.pub_med.unwrap_or_default(),
+                    ext_set.pub_med_central.unwrap_or_default(),
+                    ext_set.ar_xiv.unwrap_or_default(),
+                    ext_set.dblp.unwrap_or_default(),
+                    ext_set.mag.unwrap_or_default()
+                ]
+            );
+        }
         Self {
             paper_id: x.paper_id.unwrap_or_default(),
             title: x.title,
-            external_id: x.external_ids.unwrap().doi.unwrap_or_default(),
+            external_id: external_ids_set,
             authors: x
                 .authors
-                .unwrap()
+                .unwrap_or_default()
                 .into_iter()
                 .map(|y| y.name)
                 .collect::<Vec<String>>()
@@ -73,7 +85,7 @@ pub struct PaperDetailTemplateDetailPrint {
     pub fields_of_study: Vec<String>,
     pub s2fields_of_study: Vec<S2FieldsOfStudy>,
     pub publication_types: Vec<String>,
-    pub publication_date: Option<String>,
+    pub publication_date: String,
     // pub journal: Option<Journal>,
     // pub citation_styles: Option<CitationStyles>,
     pub authors: Vec<Author>,
@@ -145,7 +157,7 @@ impl From<PaperDetail> for PaperDetailTemplateDetailPrint {
             open_access_pdf: open_pdf_map,
             fields_of_study: sorce.fields_of_study,
             publication_types: sorce.publication_types.unwrap_or_default(),
-            publication_date: sorce.publication_date,
+            publication_date: sorce.publication_date.unwrap_or_default(),
             authors: sorce.authors,
             references_count: sorce.reference_count,
             citations_count: sorce.citation_count,

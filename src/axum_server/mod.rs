@@ -7,22 +7,21 @@ use crate::axum_server::template::{
 };
 
 use axum::{
-    extract::{Path, RawForm},
-    http::{HeaderValue, Method},
-    routing::IntoMakeService,
+    extract,
+    extract::{Form, Path, RawForm},
     routing::{get, post},
     Router,
 };
-
-use axum_htmx::HxBoosted;
-use query_map::QueryMap;
-use tower_http::cors::CorsLayer;
 
 use crate::semantic_scholar_api::{
     critions::{fetch_citing, fetch_references, CitingRequest},
     paper_fetch::{fetch_paper_detail, fetch_papers, BulkRequest},
 };
 
+use crate::axum_server::api::pdf::pdf_download;
+use axum_htmx::HxBoosted;
+use query_map::QueryMap;
+use serde::{Deserialize, Serialize};
 
 pub async fn paper_index() -> SearchPageLayoutTemplate {
     let result = fetch_papers(BulkRequest {
@@ -132,18 +131,58 @@ pub async fn paper_citation(Path(paper_id): Path<String>) -> CitingListResponse 
     }
 }
 
-pub fn create_router_service() -> IntoMakeService<Router> {
-    Router::new()
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PaperCloneRequest {
+    doi: String,
+    url: String,
+}
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PaperCloneResponse {
+    status: String,
+}
+
+pub async fn api_paper_clone(
+    Form(payload): Form<PaperCloneRequest>,
+) -> axum::Json<PaperCloneResponse> {
+    // println!("payload: {:#?}", payload);
+    println!("here");
+    // tokio::spawn(async move {
+    // pdf_download("10.1145/3292500.3330648", "https://dl.acm.org/doi/pdf/10.1145/3292500.3330648").await.unwrap();
+    //    match  pdf_download(&payload.doi, &payload.url).await {
+    //         Ok(_) => {
+    //             println!("pdf_download success");
+    //         }
+    //         Err(e) => {
+    //             println!("pdf_download error: {:#?}", e);
+    //         }
+    //     }
+    // match convert_pdf_to_text(&payload.doi).await {
+    //     Ok(_) => {
+    //         println!("convert_pdf_to_text success");
+    //     }
+    //     Err(e) => {
+    //         println!("convert_pdf_to_text error: {:#?}", e);
+    //
+
+    // });
+    axum::Json(PaperCloneResponse {
+        status: "accpeted".to_string(),
+    })
+}
+
+pub fn create_router_service() -> Router {
+    let page_route = Router::new()
         .route("/", get(paper_index))
         .route("/x/paper_search", post(search_paper))
         .route("/x/paper/:paper_id", get(paper_detail))
         .route("/x/paper/:paper_id/references", get(paper_references))
-        .route("/x/paper/:paper_id/citations", get(paper_citation))
-        // .route("/api", get(json))
-        .layer(
-            CorsLayer::new()
-                .allow_origin("http://localhost:3000".parse::<HeaderValue>().unwrap())
-                .allow_methods([Method::GET, Method::POST, Method::DELETE, Method::PUT]),
-        )
-        .into_make_service()
+        .route("/x/paper/:paper_id/citations", get(paper_citation));
+
+    let api_route = Router::new().route("/paper/clone", post(api_paper_clone));
+
+    Router::new().nest("/", page_route).nest("/api", api_route)
+    // .nest(
+    //     "/static",
+    //     axum::service::get(axum_static_service::new(std::path::Path::new("./static"))),
+    // )
 }
