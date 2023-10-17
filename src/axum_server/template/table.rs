@@ -1,4 +1,4 @@
-use crate::semantic_scholar_api::data::{Author, ExternalIds, Paper, PaperDetail, S2FieldsOfStudy};
+use crate::semantic_scholar_api::data::{Author, Paper, PaperDetail, S2FieldsOfStudy};
 use askama::Template;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;

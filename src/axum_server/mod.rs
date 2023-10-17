@@ -7,7 +7,6 @@ use crate::axum_server::template::{
 };
 
 use axum::{
-    extract,
     extract::{Form, Path, RawForm},
     routing::{get, post},
     Router,
@@ -18,7 +17,7 @@ use crate::semantic_scholar_api::{
     paper_fetch::{fetch_paper_detail, fetch_papers, BulkRequest},
 };
 
-use crate::axum_server::api::pdf::pdf_download;
+
 use axum_htmx::HxBoosted;
 use query_map::QueryMap;
 use serde::{Deserialize, Serialize};
@@ -142,7 +141,7 @@ pub struct PaperCloneResponse {
 }
 
 pub async fn api_paper_clone(
-    Form(payload): Form<PaperCloneRequest>,
+    Form(_payload): Form<PaperCloneRequest>,
 ) -> axum::Json<PaperCloneResponse> {
     // println!("payload: {:#?}", payload);
     println!("here");

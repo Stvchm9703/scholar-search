@@ -23,8 +23,8 @@ pub async fn pdf_download(doi: &str, url: &str) -> Result<(), Error> {
     fs::create_dir_all("data/pdf_temp")?;
     let doi_path = doi
         .to_case(Case::Snake)
-        .replace("/", "__")
-        .replace(".", "__");
+        .replace('/', "__")
+        .replace('.', "__");
     let mut out = std::fs::File::create(format!("data/pdf_temp/{}.pdf", doi_path))?;
     let content_bytes = resp.bytes().await?;
     let mut content = Cursor::new(content_bytes.to_owned());
@@ -43,12 +43,12 @@ pub async fn pdf_download(doi: &str, url: &str) -> Result<(), Error> {
 pub async fn convert_pdf_to_text(doi: &str) -> Result<(), Error> {
     let doi_path = doi
         .to_case(Case::Snake)
-        .replace("/", "__")
-        .replace(".", "__");
-    let mut doc = lopdf::Document::load(format!("data/pdf_temp/{}.pdf", doi_path))?;
+        .replace('/', "__")
+        .replace('.', "__");
+    let doc = lopdf::Document::load(format!("data/pdf_temp/{}.pdf", doi_path))?;
     let toc = doc.get_toc().unwrap();
     println!("toc: {:#?}", toc);
-    let pages = doc.get_pages();
+    let _pages = doc.get_pages();
     // for page in pages {
     //     let content = doc.get_content().unwrap();
     //     println!("content: {:#?}", content);
@@ -57,7 +57,7 @@ pub async fn convert_pdf_to_text(doi: &str) -> Result<(), Error> {
 }
 
 mod test {
-    use super::*;
+    
     #[tokio::test]
     async fn test_pdf_download() {
         println!(
