@@ -1,11 +1,8 @@
 use crate::semantic_scholar_api::critions::CitingDaum;
-use crate::semantic_scholar_api::data::{
-    Author, Embedding, Journal, OpenAccessPdf, Paper, PaperDetail, PublicationVenue,
-    S2FieldsOfStudy, Tldr,
-};
+
 use askama::Template;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+
 
 #[derive(Template, Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

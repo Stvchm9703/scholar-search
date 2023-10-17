@@ -1,10 +1,10 @@
 use crate::semantic_scholar_api::data::{
-    Author, Embedding, Journal, OpenAccessPdf, Paper, PaperDetail, PublicationVenue,
-    S2FieldsOfStudy, Tldr,
+    Author, Paper, PaperDetail,
+    S2FieldsOfStudy,
 };
 use askama::Template;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, hash::Hash};
+use std::{collections::HashMap};
 
 #[derive(Template, Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[template(path = "table_row.html", ext = "html")]
@@ -144,12 +144,12 @@ impl From<PaperDetail> for PaperDetailTemplateDetailPrint {
             is_open_access: sorce.is_open_access,
             open_access_pdf: open_pdf_map,
             fields_of_study: sorce.fields_of_study,
-            publication_types: sorce.publication_types.unwrap_or(Vec::new()),
+            publication_types: sorce.publication_types.unwrap_or_default(),
             publication_date: sorce.publication_date,
             authors: sorce.authors,
             references_count: sorce.reference_count,
             citations_count: sorce.citation_count,
-            s2fields_of_study: sorce.s2fields_of_study.unwrap_or(Vec::new()),
+            s2fields_of_study: sorce.s2fields_of_study.unwrap_or_default(),
             // references: sorce
             //     .references
             //     .unwrap_or(Vec::new())

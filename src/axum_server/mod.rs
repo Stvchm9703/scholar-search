@@ -5,7 +5,7 @@ use crate::axum_server::template::{
     search_page::{SearchPageLayoutTemplate, SearchResultTemplate},
     table::{PaperDetailTemplate, PaperDetailTemplateDetailPrint, TableRowTemplate},
 };
-use axum;
+
 use axum::{
     extract::{Path, RawForm},
     http::{HeaderValue, Method},
@@ -29,7 +29,7 @@ pub async fn paper_index() -> SearchPageLayoutTemplate {
         query: String::from(r#"AI ML NLP"#),
         publication_date_or_year: String::from("2019:"),
         min_citation_count: 3,
-        ..BulkRequest::default()
+        // ..BulkRequest::default()
     })
     .await
     .unwrap();
@@ -38,7 +38,7 @@ pub async fn paper_index() -> SearchPageLayoutTemplate {
         total_count: result.total,
         rows: papers
             .into_iter()
-            .map(|x| TableRowTemplate::from(x))
+            .map(TableRowTemplate::from)
             .collect::<Vec<TableRowTemplate>>(),
     }
 }
@@ -71,7 +71,7 @@ pub async fn search_paper(
             .data
             .unwrap()
             .into_iter()
-            .map(|x| TableRowTemplate::from(x))
+            .map(TableRowTemplate::from)
             .collect::<Vec<TableRowTemplate>>(),
     }
 }
@@ -105,7 +105,7 @@ pub async fn paper_references(Path(paper_id): Path<String>) -> CitingListRespons
             .data
             .unwrap()
             .into_iter()
-            .map(|x| CitingListRowTemplate::from(x))
+            .map(CitingListRowTemplate::from)
             .collect::<Vec<CitingListRowTemplate>>(),
     }
 }
@@ -127,7 +127,7 @@ pub async fn paper_citation(Path(paper_id): Path<String>) -> CitingListResponse 
             .data
             .unwrap()
             .into_iter()
-            .map(|x| CitingListRowTemplate::from(x))
+            .map(CitingListRowTemplate::from)
             .collect::<Vec<CitingListRowTemplate>>(),
     }
 }
