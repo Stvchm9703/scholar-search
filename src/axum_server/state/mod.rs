@@ -117,8 +117,6 @@ impl PdfFileState for StateMach {
 
 mod test {
     use super::*;
-
-    
     #[tokio::test]
     async fn test_set_file_status() {
         let state_mach = StateMach::new();
