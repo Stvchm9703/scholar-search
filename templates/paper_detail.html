@@ -13,24 +13,29 @@
     <p>{{ paper_detail.abstract_field }}</p>
 
     <h3> Open Access </h3>
+    {% if paper_detail.open_access_pdf.contains_key("url") -%}
     <form  hx-post="/api/paper/clone" hx-target="">
       status : {{ paper_detail.open_access_pdf.get("status").unwrap() }}
-     <a target="_blank" href={{ paper_detail.open_access_pdf.get("url").unwrap() }}>Link </a>
+      <a target="_blank" href={{ paper_detail.open_access_pdf.get("url").unwrap() }}>Link </a>
 
-     <input type="hidden" name="paper_id" value={{ paper_detail.paper_id }} />
-     <input type="hidden" name="url" value={{ paper_detail.open_access_pdf.get("url").unwrap() }} />
+      <input type="hidden" name="paper_id" value={{ paper_detail.paper_id }} />
+      <input type="hidden" name="url" value={{ paper_detail.open_access_pdf.get("url").unwrap() }} />
       <input type="hidden" name="doi" value={{ paper_detail.external_ids.get("doi").unwrap() }} />
-     <button
-        type="submit"
-        class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
-        id="clone-button"
-      >
-        <span id="status-unclone">Clone</span>
-        <span id="status-cloned" class="hidden">Cloned</span>
-        <span id="status-loading" class="hidden">Cloning</span>
-      </button>
-     
+      <button
+          type="submit"
+          class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
+          id="clone-button"
+        >
+          <span id="status-unclone">Clone</span>
+          <span id="status-cloned" class="hidden">Cloned</span>
+          <span id="status-loading" class="hidden">Cloning</span>
+        </button>
     </form>
+    {% else -%}
+    <div>
+      <span>Not Open Access</span>
+    </div>
+    {% endif -%}
 
     <div id="accordion-collapse" class="max-w-full" data-accordion="open">
       <h2 id="reference-accordion-collapse">

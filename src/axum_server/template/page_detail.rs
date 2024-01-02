@@ -37,6 +37,20 @@ pub struct CitingListRowTemplate {
 
 impl From<CitingDaum> for CitingListRowTemplate {
     fn from(x: CitingDaum) -> Self {
+        let mut external_ids_set: String = "".to_string();
+        if let Some(ext_set) = x.citing_paper.external_ids {
+            external_ids_set = format!(
+                "{:?}",
+                vec![
+                    ext_set.doi.unwrap_or_default(),
+                    ext_set.pub_med.unwrap_or_default(),
+                    ext_set.pub_med_central.unwrap_or_default(),
+                    ext_set.ar_xiv.unwrap_or_default(),
+                    ext_set.dblp.unwrap_or_default(),
+                    ext_set.mag.unwrap_or_default()
+                ]
+            );
+        }
         Self {
             contexts: x.contexts,
             intents: x.intents,
@@ -44,7 +58,7 @@ impl From<CitingDaum> for CitingListRowTemplate {
 
             paper_id: x.citing_paper.paper_id.unwrap_or_default(),
             title: x.citing_paper.title,
-            external_id: x.citing_paper.external_ids.unwrap().doi.unwrap_or_default(),
+            external_id: external_ids_set,
             authors: x
                 .citing_paper
                 .authors

@@ -1,13 +1,18 @@
 pub mod api;
+pub mod state;
 pub mod template;
-use crate::axum_server::template::{
-    page_detail::{CitingListResponse, CitingListRowTemplate},
-    search_page::{SearchPageLayoutTemplate, SearchResultTemplate},
-    table::{PaperDetailTemplate, PaperDetailTemplateDetailPrint, TableRowTemplate},
+use crate::axum_server::{
+    api::pdf::pdf_download,
+    state::{PdfFileState, PdfFileStatus},
+    template::{
+        page_detail::{CitingListResponse, CitingListRowTemplate},
+        search_page::{SearchPageLayoutTemplate, SearchResultTemplate},
+        table::{PaperDetailTemplate, PaperDetailTemplateDetailPrint, TableRowTemplate},
+    },
 };
 
 use axum::{
-    extract::{Form, Path, RawForm},
+    extract::{Form, Path, RawForm, State},
     routing::{get, post},
     Router,
 };
@@ -17,6 +22,7 @@ use crate::semantic_scholar_api::{
     paper_fetch::{fetch_paper_detail, fetch_papers, BulkRequest},
 };
 
+use crate::axum_server::state::StateMach;
 
 use axum_htmx::HxBoosted;
 use query_map::QueryMap;
@@ -75,7 +81,10 @@ pub async fn search_paper(
 }
 
 // async fn path(Path(user_id): Path<u32>) {}
-pub async fn paper_detail(Path(paper_id): Path<String>) -> PaperDetailTemplate {
+pub async fn paper_detail(
+    State(_state_mach): State<StateMach>,
+    Path(paper_id): Path<String>,
+) -> PaperDetailTemplate {
     // println!("paper_id: {:#?}", paper_id);
     let paper = fetch_paper_detail(paper_id.to_owned()).await.unwrap();
     PaperDetailTemplate {
@@ -132,6 +141,7 @@ pub async fn paper_citation(Path(paper_id): Path<String>) -> CitingListResponse 
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct PaperCloneRequest {
+    paper_id: String,
     doi: String,
     url: String,
 }
@@ -141,9 +151,54 @@ pub struct PaperCloneResponse {
 }
 
 pub async fn api_paper_clone(
-    Form(_payload): Form<PaperCloneRequest>,
+    State(state_mach): State<StateMach>,
+    Form(payload): Form<PaperCloneRequest>,
 ) -> axum::Json<PaperCloneResponse> {
-    // println!("payload: {:#?}", payload);
+    println!("payload: {:#?}", payload);
+    println!("here");
+    // tokio::spawn(async move {
+    // pdf_download("10.1145/3292500.3330648", "https://dl.acm.org/doi/pdf/10.1145/3292500.3330648").await.unwrap();
+    let mut status = state_mach.check_file_status(&payload.paper_id);
+    if status == PdfFileStatus::None {
+        state_mach.set_file_status(&payload.paper_id, PdfFileStatus::Accpeted);
+        match pdf_download(&payload.paper_id, &payload.url).await {
+            Ok(_) => {
+                state_mach.set_file_status(&payload.paper_id, PdfFileStatus::Downloaded);
+                println!("pdf_download success");
+                // if convert_pdf_to_text(&payload.paper_id).await.is_ok() {
+                //     state_mach.set_file_status(&payload.paper_id, PdfFileStatus::Converted);
+                //     println!("convert_pdf_to_text success");
+                // } else {
+                //     println!("convert_pdf_to_text error");
+                // }
+            }
+            Err(e) => {
+                println!("pdf_download error: {:#?}", e);
+            }
+        }
+    }
+    state_mach.println();
+    status = state_mach.check_file_status(&payload.paper_id);
+    axum::Json(PaperCloneResponse {
+        status: status.to_string(),
+    })
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PaperBookmarkRequest {
+    doi: String,
+    url: String,
+}
+#[derive(Deserialize, Serialize, Debug)]
+pub struct PaperBookmarkResponse {
+    status: String,
+}
+
+pub async fn api_paper_bookmark(
+    State(_state_mach): State<StateMach>,
+    Form(payload): Form<PaperBookmarkRequest>,
+) -> axum::Json<PaperBookmarkResponse> {
+    println!("payload: {:#?}", payload);
     println!("here");
     // tokio::spawn(async move {
     // pdf_download("10.1145/3292500.3330648", "https://dl.acm.org/doi/pdf/10.1145/3292500.3330648").await.unwrap();
@@ -164,12 +219,13 @@ pub async fn api_paper_clone(
     //
 
     // });
-    axum::Json(PaperCloneResponse {
-        status: "accpeted".to_string(),
+    axum::Json(PaperBookmarkResponse {
+        status: "".to_string(),
     })
 }
 
 pub fn create_router_service() -> Router {
+    let state_mach = StateMach::new();
     let page_route = Router::new()
         .route("/", get(paper_index))
         .route("/x/paper_search", post(search_paper))
@@ -177,9 +233,14 @@ pub fn create_router_service() -> Router {
         .route("/x/paper/:paper_id/references", get(paper_references))
         .route("/x/paper/:paper_id/citations", get(paper_citation));
 
-    let api_route = Router::new().route("/paper/clone", post(api_paper_clone));
+    let api_route = Router::new()
+        .route("/paper/clone", post(api_paper_clone))
+        .route("/paper/bookmark", post(api_paper_bookmark));
 
-    Router::new().nest("/", page_route).nest("/api", api_route)
+    Router::new()
+        .nest("/", page_route)
+        .nest("/api", api_route)
+        .with_state(state_mach)
     // .nest(
     //     "/static",
     //     axum::service::get(axum_static_service::new(std::path::Path::new("./static"))),

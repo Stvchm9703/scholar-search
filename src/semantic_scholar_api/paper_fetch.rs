@@ -48,7 +48,7 @@ impl Default for BulkRequest {
         }
     }
 }
-#[warn(dead_code)]
+// #[warn(dead_code)]
 pub async fn fetch_papers(
     request: BulkRequest,
 ) -> Result<BulkResponse, Box<dyn std::error::Error>> {
@@ -65,7 +65,6 @@ pub async fn fetch_papers(
     // let bulk_response: BulkResponse = response.()?;
     Ok(response)
 }
-
 
 pub async fn fetch_paper_detail(
     paper_id: String,

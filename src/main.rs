@@ -6,7 +6,12 @@ use crate::axum_server::create_router_service;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt()
+        .with_target(false)
+        // .with_timer(tracing_subscriber::fmt::time::uptime())
+        // .with_level(true)
+        .with_max_level(tracing::Level::DEBUG)
+        .init();
     // let app = Router::new().nest("/", page_service());
     axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
         .serve(create_router_service().into_make_service())

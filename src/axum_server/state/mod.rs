@@ -1,5 +1,9 @@
+use serde_derive::{Deserialize, Serialize};
 use sled;
+use std::fmt;
+use std::fmt::Debug;
 
+#[derive(Debug, Clone)]
 pub struct StateMach {
     db: sled::Db,
 }
@@ -19,7 +23,6 @@ impl StateMach {
 
     pub fn set(&self, key: &str, value: &str) {
         if let Some(_) = self.get(key) {
-          
             self.db.insert(key, value).unwrap();
             return;
         }
@@ -52,14 +55,14 @@ impl StateMach {
     }
 
     pub fn println(&self) {
-        println("StateMach");
-        println("---------");
+        println!("StateMach");
+        println!("---------");
         for (k, v) in self.get_all() {
             println!("{}: {}", k, v);
         }
-        println();
-        println(self.db.stats().unwrap());
-        println("---------");
+        println!();
+        // println!("{:?}", self.db.stats().unwrap());
+        println!("---------");
     }
 }
 
@@ -75,29 +78,44 @@ impl Drop for StateMach {
     }
 }
 
-impl Display for StateMach {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl std::fmt::Display for StateMach {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "StateMach")
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone, Copy)]
 pub enum PdfFileStatus {
-    None(Result::None),
-    Accpeted,
-    Downloaded,
-    Converted,
-    Indexed,
-    Patched,
+    None = 0,
+    Accpeted = 1,
+    Downloaded = 2,
+    Converted = 3,
+    Indexed = 4,
+    Patched = 5,
+}
+impl fmt::Display for PdfFileStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PdfFileStatus::None => write!(f, "none"),
+            PdfFileStatus::Accpeted => write!(f, "accpeted"),
+            PdfFileStatus::Downloaded => write!(f, "downloaded"),
+            PdfFileStatus::Converted => write!(f, "converted"),
+            PdfFileStatus::Indexed => write!(f, "indexed"),
+            PdfFileStatus::Patched => write!(f, "patched"),
+        }
+    }
 }
 
 pub trait PdfFileState {
-    pub fn check_file_status(paper_id: &str);
+    fn check_file_status(&self, paper_id: &str) -> PdfFileStatus;
+    fn set_file_status_raw(&self, paper_id: &str, status: &str);
+    fn set_file_status(&self, paper_id: &str, status: PdfFileStatus);
 }
 
 impl PdfFileState for StateMach {
-    fn check_file_status(self, paper_id: &str) -> PdfFileStatus {
+    fn check_file_status(&self, paper_id: &str) -> PdfFileStatus {
         match self.get(paper_id) {
-            Ok(paper_val) => match paper_val {
+            Some(paper_val) => match paper_val.as_str() {
                 "accpeted" => PdfFileStatus::Accpeted,
                 "downloaded" => PdfFileStatus::Downloaded,
                 "converted" => PdfFileStatus::Converted,
@@ -105,25 +123,30 @@ impl PdfFileState for StateMach {
                 "patched" => PdfFileStatus::Patched,
                 _ => PdfFileStatus::None,
             },
-            None => PaperFileStatus::None,
+            None => PdfFileStatus::None,
         }
     }
 
-    fn set_file_status(self, paper_id: &str, status: &str) {
+    fn set_file_status_raw(&self, paper_id: &str, status: &str) {
         self.set(paper_id, status);
+    }
+    fn set_file_status(&self, paper_id: &str, status: PdfFileStatus) {
+        self.set(paper_id, status.to_string().as_str());
     }
 }
 
 
+
 mod test {
-    use super::*;
+    
+
     #[tokio::test]
     async fn test_set_file_status() {
         let state_mach = StateMach::new();
-        state_mach.set_file_status("10.1145/3292500.3330648", "accpeted");
+        state_mach.set_file_status("10.1145/3292500.3330648", PdfFileStatus::Accpeted);
         assert_eq!(
             state_mach.check_file_status("10.1145/3292500.3330648"),
-            PaperFileStatus::Accpeted
+            PdfFileStatus::Accpeted
         );
     }
 }

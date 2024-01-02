@@ -3,7 +3,6 @@ use askama::Template;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-
 #[derive(Template, Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[template(path = "table_row.html", ext = "html")]
 pub struct TableRowTemplate {
@@ -99,6 +98,7 @@ pub struct PaperDetailTemplateDetailPrint {
 
 impl From<PaperDetail> for PaperDetailTemplateDetailPrint {
     fn from(sorce: PaperDetail) -> Self {
+        
         let mut external_ids_map: HashMap<String, String> = HashMap::new();
         if let Some(ext_ids) = sorce.external_ids {
             if ext_ids.doi.is_some() {
@@ -155,10 +155,10 @@ impl From<PaperDetail> for PaperDetailTemplateDetailPrint {
             influential_citation_count: sorce.influential_citation_count,
             is_open_access: sorce.is_open_access,
             open_access_pdf: open_pdf_map,
-            fields_of_study: sorce.fields_of_study,
+            fields_of_study: sorce.fields_of_study.unwrap_or_default(),
             publication_types: sorce.publication_types.unwrap_or_default(),
             publication_date: sorce.publication_date.unwrap_or_default(),
-            authors: sorce.authors,
+            authors: sorce.authors.unwrap_or_default(),
             references_count: sorce.reference_count,
             citations_count: sorce.citation_count,
             s2fields_of_study: sorce.s2fields_of_study.unwrap_or_default(),
