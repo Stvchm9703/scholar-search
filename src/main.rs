@@ -13,7 +13,7 @@ async fn main() {
         .with_max_level(tracing::Level::DEBUG)
         .init();
     // let app = Router::new().nest("/", page_service());
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("0.0.0.0:3600").await.unwrap();
     axum::serve(listener,create_router_service().into_make_service())
         .await
         .unwrap();
