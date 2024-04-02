@@ -14,7 +14,7 @@ async fn main() {
         .init();
     // let app = Router::new().nest("/", page_service());
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3600").await.unwrap();
-    axum::serve(listener,create_router_service().into_make_service())
+    axum::serve(listener, create_router_service().into_make_service())
         .await
         .unwrap();
 }

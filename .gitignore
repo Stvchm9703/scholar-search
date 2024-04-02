@@ -21,3 +21,4 @@ Cargo.lock
 
 .DS_Store
 data/pdf_temp
+data/state_mach

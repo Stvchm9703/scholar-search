@@ -1,0 +1,52 @@
+[package]
+name = "scholar-search"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = { workspace = true }
+chrono = { workspace = true }
+polars = { workspace = true }
+
+serde_derive = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_path_to_error = { workspace = true }
+
+# web services
+reqwest = { workspace = true }
+prost = { workspace = true }
+tokio = { workspace = true }
+tokio-stream ={ workspace = true }
+async-stream = { workspace = true }
+axum = { workspace = true }
+axum-extra = { workspace = true }
+axum-htmx = { workspace = true }
+sled =  { workspace = true }
+query_map =  { workspace = true }
+askama =  { workspace = true }
+askama_axum =  { workspace = true }
+
+# logging
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+regex = { workspace = true }
+convert_case = { workspace = true }
+
+# pdf relevant
+lopdf = { version = "0.32.0", features = ["serde", "pom_parser", "nom_parser"] }
+pdf-extract = "0.7.2"
+fast_symspell = "0.1.7"
+ryaspeller = "*"
+
+
+structopt =  { workspace = true }
+glob = { workspace = true }
+rand =  { workspace = true }
+
+
+
+# kalosm = "0.2.1"
+# kalosm-ocr = "0.2.1"

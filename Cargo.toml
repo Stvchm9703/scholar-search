@@ -1,12 +1,11 @@
-[package]
-name = "scholar-search"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+default-members = ["crates/*"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-anyhow = "1.0.33"
+[workspace.dependencies]
+anyhow = "1.0.81"
 chrono = { version = "0.4", features = ["serde", "alloc"] }
 polars = { version = "0.36.2", features = [
   "serde",
@@ -30,7 +29,10 @@ reqwest = { version = "*", features = [
   "deflate",
   "stream",
 ] }
+
+# tokio web service
 prost = "0.12"
+prost-types = "0.12"
 tokio = { version = "1", features = [
   "full",
   "rt-multi-thread",
@@ -49,17 +51,20 @@ axum-extra = { version = "0.9.3", features = [
   "protobuf",
 ] }
 axum-htmx = "0.5.0"
+tonic = { version = "0.11", features = ["full"] }
+tower = { version = "0.4.13", features = ["full"] }
+hyper = { version = "1.2.0", features = ["full"] }
+askama = { version = "0.12.1", features = ["serde-json", "markdown"] }
+askama_axum = "0.4.0"
 
-tower-http = { version = "0.5.2", features = ["cors"] }
+
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-
+regex = { version = "1.9.5", features = ["perf", "unicode"] }
+convert_case = "0.6.0"
 
 lopdf = { version = "0.32.0", features = ["serde", "pom_parser", "nom_parser"] }
 pdf-extract = "0.7.2"
-
-regex = { version = "1.9.5", features = ["perf", "unicode"] }
-convert_case = "0.6.0"
 fast_symspell = "0.1.7"
 # tch = "0.13.0"
 # rust-bert = { version = "0.21.0", features = ["download-libtorch"] }
@@ -75,10 +80,9 @@ glob = "0.3.1"
 rand = "0.8.5"
 query_map = { version = "0.7.0", features = ["url-query"] }
 
-askama = { version = "0.12.1", features = ["serde-json", "markdown"] }
-askama_axum = "0.4.0"
 
 sled = "0.34.7"
 ryaspeller = "*"
 # kalosm = "0.2.1"
 # kalosm-ocr = "0.2.1"
+
